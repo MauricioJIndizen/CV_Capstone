@@ -9,6 +9,7 @@ from tensorflow.keras.preprocessing.image import load_img
 from tensorflow.keras.preprocessing.image import img_to_array
 from sklearn.preprocessing import LabelEncoder
 from sklearn.metrics import confusion_matrix, classification_report
+from utils import *
 
 #LOAD HAAR CASCADE MODELS TO DETECT FACE AND EYES
 face_cascade, eye_cascade = load_haarcascade()
