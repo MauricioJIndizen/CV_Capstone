@@ -2,6 +2,7 @@ import numpy as np
 import pandas as pd
 from tensorflow import keras
 import os
+import cv2
 from sklearn.preprocessing import LabelEncoder
 from tensorflow.keras.preprocessing.image import load_img
 from tensorflow.keras.preprocessing.image import img_to_array
