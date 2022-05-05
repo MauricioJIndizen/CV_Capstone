@@ -55,7 +55,7 @@ while 1:
             text_x = int(ex+ew/4)
             text_y = int(ey-20)
             #DRAW TEXT OVER EYES
-            cv2.putText(roi_color, result, (text_x, text_y), font, fontScale, color, thickness, cv2.LINE_AA)
+            cv2.putText(roi_color, result, (text_x, text_y), font, fontScale, (255,0,0), thickness, cv2.LINE_AA)
     cv2.imshow('img',img)
     k = cv2.waitKey(30) & 0xff
     if k == 27:
