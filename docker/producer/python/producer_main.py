@@ -7,10 +7,6 @@ Created on Fri May  6 10:18:52 2022
 
 from kafka_arc import *
 
-from multiprocessing import Process
-import asyncio
-import time
-
 def main():
     producer = Producer('testing')
     producer.publish_camera()

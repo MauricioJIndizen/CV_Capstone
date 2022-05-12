@@ -6,63 +6,16 @@ Created on Thu Apr 21 16:11:38 2022
 """
 
 import sys
-import time
 import cv2
 import numpy as np
 from datetime import datetime
-from PIL import Image
-from io import BytesIO
-from kafka import KafkaProducer, KafkaConsumer
+from kafka import  KafkaConsumer
 from keras.models import load_model
 from skimage.transform import resize
 import os
 import pandas as pd
-from tensorflow.keras.preprocessing.image import load_img
-from tensorflow.keras.preprocessing.image import img_to_array
-from sklearn.preprocessing import LabelEncoder
 import time
-from utils import *
-
-class Producer():
-
-    def __init__(self, topic):
-        self.topic = topic
-        self.producer = KafkaProducer(bootstrap_servers='localhost:9092')
-        
-    def publish_camera(self):
-    
-        print("publishing feed!")
-        camera = cv2.VideoCapture(0)
-        num_frames = 120
-        try:
-            while(True):
-                success, image = camera.read()
-                if num_frames == 120:
-                    start = time.time()
-                elif num_frames == 0:
-                    num_frames = 121
-                    end = time.time()
-                    seconds = end - start
-                    print ("Time taken : {0} seconds".format(seconds))
-                    # Calculate frames per second
-                    fps  = 120 / seconds
-                    print("Estimated frames per second : {0}".format(fps))
-                dt = str(datetime.now())
-                frame = cv2.putText(image, dt, (0,20), fontFace = cv2.FONT_HERSHEY_PLAIN, fontScale = 1.0, color = (255,0,0), thickness = 1, lineType = cv2.LINE_AA)
-                ret, buffer = cv2.imencode('.jpg', frame)
-                self.producer.send(self.topic, buffer.tobytes())
-                #self.producer.send(self.topic, 'hello there')
-                #self.producer.flush()
-                
-                # Choppier stream, reduced load on processor
-                num_frames = num_frames - 1    
-        except Exception as e:
-            print(e)
-            print("\nExiting.")
-            camera.release()
-            cv2.destroyAllWindows()
-        
-        sys.exit(1)
+from utils import load_haarcascade
 
 class Consumer():
     
@@ -93,7 +46,7 @@ class Consumer():
                 #img = cv2.putText(img, dt, (0,50), fontFace = cv2.FONT_HERSHEY_PLAIN, fontScale = 1.0, color = (255,0,0), thickness = 1, lineType = cv2.LINE_AA)
                 #cv2.imwrite('wcam_imgs/' + str(i) + '.jpg', img)
                 gray = cv2.cvtColor(img, cv2.COLOR_BGR2GRAY)
-    
+
                 #DETECT FACES FROM IMAGE
                 faces = face_cascade.detectMultiScale(gray, 1.3, 5)
 
@@ -124,6 +77,10 @@ class Consumer():
 
                 i += 1
                 num_frames = num_frames - 1
+                cv2.imshow("image", img)
+                k = cv2.waitKey(30) & 0xff
+                if k == 27:
+                    break
             except Exception as e:
                 print('#############################')
                 print(e)
