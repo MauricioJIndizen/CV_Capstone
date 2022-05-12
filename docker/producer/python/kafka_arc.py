@@ -18,7 +18,6 @@ class Producer():
         self.producer = KafkaProducer(bootstrap_servers='localhost:9092')
         
     def publish_camera(self):
-    
         print("publishing feed!")
         camera = cv2.VideoCapture(0)
         num_frames = 120
