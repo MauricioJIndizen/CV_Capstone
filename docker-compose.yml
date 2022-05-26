@@ -1,20 +1,40 @@
 version: '3'
 
+networks:
+    kafka_network:
+        name: kafka_network
+
 services:
     zookeeper:
         image: wurstmeister/zookeeper
         container_name: zookeeper
         ports:
             - "2181:2181"
+        networks: 
+            - kafka_network
     kafka:
         image: wurstmeister/kafka
         container_name: kafka-server
         ports:
-            - "9092:9092"
+            - "9092:9094"
         environment:
             KAFKA_ADVERTISED_HOST_NAME: localhost
             KAFKA_ZOOKEEPER_CONNECT: zookeeper:2181
-    #producer:
-    #    build: ./docker/producer/
-    #consumer:
-    #    build: ./docker/consumer/    
+        networks: 
+            - kafka_network
+        depends_on:
+            - zookeeper
+    producer:
+        build: ./docker/producer/
+        depends_on:
+            - kafka
+        networks: 
+            - kafka_network
+
+    consumer:
+        build: ./docker/consumer/    
+        depends_on:
+            - kafka
+            - producer
+        networks: 
+            - kafka_network
