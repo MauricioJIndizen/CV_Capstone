@@ -103,6 +103,8 @@ class Consumer():
                         cv2.putText(frame, result, (text_x, text_y), cv2.FONT_HERSHEY_PLAIN, 1, (255,0,0), 1, cv2.LINE_AA)
                 filename = dt + ".jpg"
                 save_path = os.path.join(actual_directory,"images")
+                if os.path.isdir(save_path) == False:
+                    os.makedirs(save_path)
                 cv2.imwrite(os.path.join(save_path,filename),frame)
                 producer = KafkaProducer(bootstrap_servers=self.server, api_version=(0,10,2))
                 text = str(self.id) 

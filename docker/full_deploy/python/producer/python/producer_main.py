@@ -46,6 +46,8 @@ def main_camera():
             filename = filename.replace(":","_")
             actual_path = os.getcwd()
             save_path = os.path.join(actual_path,"images")
+            if os.path.isdir(save_path) == False:
+                os.makedirs(save_path)
             cv2.imwrite(os.path.join(save_path,filename),frame)
             print(os.path.join(save_path,filename))
             if producer_index < len(producers)-1 and len(producers) > 1:
