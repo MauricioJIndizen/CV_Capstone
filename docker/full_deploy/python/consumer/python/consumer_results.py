@@ -12,10 +12,10 @@ Created on Fri May  6 10:18:52 2022
 @author: mauricio.jurado
 """
 
-from kafka_arc import Consumer
+from Consumer import Consumer
 
 def main():
-    consumer = Consumer('results','localhost:9092',1, "grupo_resultados")
+    consumer = Consumer('capstone_drowsiness_output','localhost:9092',1, "grupo_resultados")
     consumer.consume_results()
     
 if __name__ == '__main__':

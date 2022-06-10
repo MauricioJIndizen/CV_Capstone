@@ -8,7 +8,6 @@ Created on Thu Apr 21 16:11:38 2022
 import sys
 import time
 import cv2
-from datetime import datetime
 from kafka import KafkaProducer
 
 class Producer():

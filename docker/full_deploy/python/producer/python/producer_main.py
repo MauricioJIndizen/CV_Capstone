@@ -10,8 +10,8 @@ import numpy as np
 import pandas as pd
 import cv2
 import time
-import datetime
-from utils import *
+from datetime import datetime
+import os
 
 def main_camera():
     id = 1
@@ -24,9 +24,10 @@ def main_camera():
     print("Publishing feed!")
     camera = cv2.VideoCapture(0,cv2.CAP_DSHOW)
     num_frames = 120
+    total_frames = 240
     producer_index = 0
     try:
-        while(True):
+        while(total_frames > 0):
             success, frame = camera.read()
             if num_frames == 120:
                 start = time.time()
@@ -38,14 +39,21 @@ def main_camera():
                 # Calculate frames per second
                 fps  = 120 / seconds
                 print("Estimated frames per second : {0}".format(fps))
-            #dt = str(datetime.now())
-            #frame = cv2.putText(image, dt, (0,20), fontFace = cv2.FONT_HERSHEY_PLAIN, fontScale = 1.0, color = (255,0,0), thickness = 1, lineType = cv2.LINE_AA)
+            dt = datetime.now().strftime("%Y-%m-%d %H:%M:%S:%f")
+            frame = cv2.putText(frame, dt, (0,20), fontFace = cv2.FONT_HERSHEY_PLAIN, fontScale = 1.0, color = (255,0,0), thickness = 1, lineType = cv2.LINE_AA)
             producers[producer_index].send_camera(frame)
+            filename = dt + ".jpg"
+            filename = filename.replace(":","_")
+            actual_path = os.getcwd()
+            save_path = os.path.join(actual_path,"images")
+            cv2.imwrite(os.path.join(save_path,filename),frame)
+            print(os.path.join(save_path,filename))
             if producer_index < len(producers)-1 and len(producers) > 1:
                 producer_index += 1
             else:
                 producer_index = 0
-            num_frames = num_frames - 1    
+            num_frames = num_frames - 1  
+            total_frames = total_frames - 1  
     except Exception as e:
         print(e)
         print("\nExiting.")
