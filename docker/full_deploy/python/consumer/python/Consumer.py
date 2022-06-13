@@ -21,7 +21,7 @@ from keras.models import load_model
 
 class Consumer():
     
-    def __init__(self, topic, broker, id, group):
+    def __init__(self, topic, broker, result_broker, id, group):
         self.consumer = KafkaConsumer(topic, bootstrap_servers=broker, consumer_timeout_ms=300000, group_id = group, api_version=(0,10,2), auto_offset_reset='earliest')
         self.id = id
         self.server = broker
@@ -53,18 +53,20 @@ class Consumer():
             nparr = np.frombuffer(msg.value, np.uint8)
             print("Consumer " + str(self.id) + "receive: " + str(nparr))
 
-    def consume_camera(self):   
+    def consume_camera(self, result_broker):   
         actual_directory = os.getcwd()
-        clf_path = os.path.join(actual_directory,'model\clf')
-        yolo_path = os.path.join(actual_directory,'model\yolo')
+        clf_path = os.path.join(actual_directory,'python\consumer\python\model\clf')
+        yolo_path = os.path.join(actual_directory,'python\consumer\python\model\yolo')
         clf_model_name = os.path.join(clf_path,'eye_classifier1_v5.h5')
         yolo_directory = os.path.join(yolo_path,'ultralytics_yolov5_master')
         yolo_model_name = os.path.join(yolo_path,'yolo.pt')
        
+        print(clf_model_name)
         clf_model = load_model(clf_model_name)
         yolo_model = torch.hub.load(yolo_directory, 'custom', path=yolo_model_name, source = "local",force_reload=True)
         print('Consuming web_cam')
         num_frames = 120
+        producer = KafkaProducer(bootstrap_servers=result_broker, api_version=(0,10,2))
         try:
             for message in self.consumer:
                 nparr = np.frombuffer(message.value, np.uint8)
@@ -106,10 +108,10 @@ class Consumer():
                 if os.path.isdir(save_path) == False:
                     os.makedirs(save_path)
                 cv2.imwrite(os.path.join(save_path,filename),frame)
-                producer = KafkaProducer(bootstrap_servers=self.server, api_version=(0,10,2))
                 text = str(self.id) 
                 data = text + ";" + dt + ";" + str(result_eyes)
                 buffer = str.encode(data)
+                print(data)
                 producer.send("capstone_drowsiness_output", buffer)
                 producer.flush()
                 num_frames = num_frames - 1

@@ -58,9 +58,10 @@ if __name__ == "__main__":
     # Kafka-Producer #
     #os.system('start "Docker Producer" cmd /k "docker build -t producer python/producer/. && docker run -it producer"')
     
-    os.system('start "Kafka Producer" cmd /k "python python/producer/python/producer_main.py"')
+    #os.system('start "Kafka Producer" cmd /k "python python/producer/python/producer_main.py"')
     
     # Kafka-Consumer #
     
     os.system('start "Kafka Consumer" cmd /k "python python/consumer/python/consumer_main.py"')
+    os.system('start "Kafka Consumer" cmd /k "python python/consumer/python/consumer_results.py"')
     #os.system('start "Docker Consumer" cmd /k "docker build -t consumer python/consumer/. && docker run -it consumer"')

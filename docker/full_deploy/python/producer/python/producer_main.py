@@ -15,7 +15,7 @@ import os
 
 def main_camera():
     id = 1
-    servers = ['localhost:9092']    
+    servers = ['20.86.145.231:9092']    
     producers = []
     topic = "capstone_drowsiness_intake"
     for server in servers:
@@ -49,7 +49,6 @@ def main_camera():
             if os.path.isdir(save_path) == False:
                 os.makedirs(save_path)
             cv2.imwrite(os.path.join(save_path,filename),frame)
-            print(os.path.join(save_path,filename))
             if producer_index < len(producers)-1 and len(producers) > 1:
                 producer_index += 1
             else:
@@ -64,7 +63,7 @@ def main_camera():
 def main():
     id = 1
     #servers = ['localhost:9091','localhost:9092','localhost:9093','localhost:9094','localhost:9095']
-    servers = ['localhost:9092']
+    servers = ['20.86.145.231:9092']
     producers = []
     for server in servers:
         topic = "testing321"

@@ -54,7 +54,7 @@ def main_camera():
 def main():
     id = 1
     #servers = ['localhost:9091','localhost:9092','localhost:9093','localhost:9094','localhost:9095']
-    servers = ['localhost:9092']
+    servers = ['20.86.145.231:9092']
     producers = []
     for server in servers:
         topic = "testing321"
@@ -70,4 +70,4 @@ def main():
             producer_index = 0
 if __name__ == '__main__':
     
-    main_camera()
+    main()
