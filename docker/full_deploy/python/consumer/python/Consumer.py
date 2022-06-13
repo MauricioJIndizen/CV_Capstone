@@ -21,7 +21,7 @@ from keras.models import load_model
 
 class Consumer():
     
-    def __init__(self, topic, broker, result_broker, id, group):
+    def __init__(self, topic, broker, id, group):
         self.consumer = KafkaConsumer(topic, bootstrap_servers=broker, consumer_timeout_ms=300000, group_id = group, api_version=(0,10,2), auto_offset_reset='earliest')
         self.id = id
         self.server = broker
@@ -55,8 +55,8 @@ class Consumer():
 
     def consume_camera(self, result_broker):   
         actual_directory = os.getcwd()
-        clf_path = os.path.join(actual_directory,'python\consumer\python\model\clf')
-        yolo_path = os.path.join(actual_directory,'python\consumer\python\model\yolo')
+        clf_path = os.path.join(actual_directory,'model/clf')
+        yolo_path = os.path.join(actual_directory,'model/yolo')
         clf_model_name = os.path.join(clf_path,'eye_classifier1_v5.h5')
         yolo_directory = os.path.join(yolo_path,'ultralytics_yolov5_master')
         yolo_model_name = os.path.join(yolo_path,'yolo.pt')
