@@ -18,6 +18,65 @@ import time
 import torch
 from keras.models import load_model
 
+###############
+# SORTED LIST #
+###############
+
+def start_alert(n):
+    print('START ' + str(n))
+    
+def end_alert(n):
+    print('END ' + str(n))
+
+class sorted_list():
+    
+    def __init__(self, max_len, order_position):
+        self.max_len = max_len
+        self.order_position = order_position
+        self.current_len = 0
+        self.check_wait = 0
+        self.max_check_wait = 5
+        self.alert = False
+        self.iter = 0
+        
+        self.list = []
+        
+    def append(self, value):
+        
+        self.iter += 1
+        
+        if self.current_len < self.max_len:
+            self.current_len += 1
+        else:
+            self.list.pop(0)
+            
+        self.list.append(value)
+        sorted(self.list, key=lambda x:x[1])
+
+        self.check_wait += 1
+        if self.check_wait == self.max_check_wait:
+            self.check_wait = 0
+            asleep = self.check_drowsy()
+            if self.alert and not asleep:
+                self.alert = False
+                end_alert(self.iter)
+            else:
+                if not self.alert and asleep:
+                    self.alert = True
+                    start_alert(self.iter)
+
+    def check_drowsy(self):
+        
+        flag = True
+        for x in self.list:
+            if 'OPENED' in x[2]:
+                flag = False
+                break
+        
+        return flag
+    
+    def get_len(self):
+        return len(self.list)
 
 class Consumer():
     
@@ -29,6 +88,9 @@ class Consumer():
     def consume_results(self):
         print("Consumer " + str(self.id) + " connected")
         num_frames = 120
+        
+        window = sorted_list(90, 1)
+        
         for message in self.consumer:
             nparr = message.value.decode()
             if num_frames == 120:
@@ -46,6 +108,8 @@ class Consumer():
             dt = nparr.split(";")[1]
             results = nparr.split(";")[2]
             print("Topic receive new message from Consumer " + id + ", with timestamp " + dt + ", and results " + results)
+            
+            window.append(nparr)
 
     def consume_text(self):
         print("Consumer " + str(self.id) + " connected")
@@ -55,8 +119,8 @@ class Consumer():
 
     def consume_camera(self, result_broker):   
         actual_directory = os.getcwd()
-        clf_path = os.path.join(actual_directory,'model/clf')
-        yolo_path = os.path.join(actual_directory,'model/yolo')
+        clf_path = os.path.join(actual_directory,'python\consumer\python\model\clf')
+        yolo_path = os.path.join(actual_directory,'python\consumer\python\model\yolo')
         clf_model_name = os.path.join(clf_path,'eye_classifier1_v5.h5')
         yolo_directory = os.path.join(yolo_path,'ultralytics_yolov5_master')
         yolo_model_name = os.path.join(yolo_path,'yolo.pt')
@@ -114,6 +178,7 @@ class Consumer():
                 print(data)
                 producer.send("capstone_drowsiness_output", buffer)
                 producer.flush()
+                
                 num_frames = num_frames - 1
         except Exception as e:
             print('#############################')

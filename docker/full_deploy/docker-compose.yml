@@ -21,7 +21,7 @@ services:
     ports:
       - "9092:9092"
     environment:
-      KAFKA_ADVERTISED_HOST_NAME: 20.86.145.231
+      KAFKA_ADVERTISED_HOST_NAME: localhost
       KAFKA_ZOOKEEPER_CONNECT: zookeeper:2181
       KAFKA_CREATE_TOPICS: "capstone_drowsiness_intake:5:1,capstone_drowsiness_output:1:1"
       #KAFKA_LISTENERS: PLAINTEXT://kafka:9092,PLAINTEXT_HOST://localhost:9093

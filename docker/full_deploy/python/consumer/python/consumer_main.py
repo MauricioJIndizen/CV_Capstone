@@ -16,8 +16,8 @@ import os
 from Consumer import Consumer
 
 def main():
-    consumer = Consumer('capstone_drowsiness_intake', '20.86.145.231:9092', 1, "grupo_1")
-    consumer.consume_camera('20.86.145.231:9092')
+    consumer = Consumer('capstone_drowsiness_intake', 'localhost:9092', 1, "grupo_1")
+    consumer.consume_camera('localhost:9092')
     
 if __name__ == '__main__':
     
