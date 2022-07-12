@@ -10,7 +10,7 @@ Capstone project for drownsiness detection with real-time webcam images. Current
 
 3) Install Docker and docker-compose for deploy containers with Kafka and Zookeeper images.
 
-4) Run main.py. This script will clean all docker containers, images, networks and volumes. Then it will run docker containers with docker-compose.yml file for Zookeeper and Kafka, and python scripts for consumer_main (inference from images published on Kafka topic), consumer_results (receive inference results from topic) and producer (publish images on Kafka topic). Note: in case of Exception "Install pypiwin32 package to enable npipe:// support", check https://github.com/twosixlabs/armory/issues/156 and run "python <path-to-python-env>\Scripts\pywin32_postinstall.py -install".
+4) Run main.py. This script will clean all docker containers, images, networks and volumes. Then it will run docker containers with docker-compose.yml file for Zookeeper and Kafka, and python scripts for consumer_main (inference from images published on Kafka topic, using YOLO model currently on production and saved on Azure Blob Storage), consumer_results (receive inference results from topic) and producer (publish images on Kafka topic). Note: in case of Exception "Install pypiwin32 package to enable npipe:// support", check https://github.com/twosixlabs/armory/issues/156 and run "python <path-to-python-env>\Scripts\pywin32_postinstall.py -install".
 
 5) If you want to do it manually, follow this steps:
 
@@ -24,6 +24,4 @@ Capstone project for drownsiness detection with real-time webcam images. Current
 
 1) Inside python folder there are 2 scripts for inference and mAP metrics for any dataset provided. 2 datasets are included, with images of a public dataset of famous people faces, and images from our webcam, with YOLO labels for eyes (class, X, Y, width and height) and results from inference included, and 2 weights from trained model versions, yolo_v2 (current best model, adn the one used in production) and yolo_v3 (most recent model, but with worse results than current).
 
-2) Run inference.py for prediction in a dataset. Images must be inside a folder named "images" inside a folder that can be passed as argument (default directory is "data"). Inference results will be saved on a folder named "results".
-
-3) Run mAP.py for mAP, precision, recall and confusion matrix metrics for any inference results inside "results" folder.
+2) Run inference.py for prediction in a dataset. Images must be inside a folder named "images" inside a folder that can be passed as argument (default directory is "data"). Inference results will be saved on a folder named "results". Results from inference will be saved on Azure Table Storage, as yolo weights used for inference, so this weights can be downloaded and used for webcam images.
