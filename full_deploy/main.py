@@ -4,6 +4,7 @@ import time
 import docker
 
 from typing import Optional
+import subprocess
 
 
 def is_container_running(container_name: str) -> Optional[bool]:
@@ -16,10 +17,17 @@ def is_container_running(container_name: str) -> Optional[bool]:
             state = inspect_dict['State']
             
             is_running = state['Status'] == 'running'
-            
             if is_running:
+                time.sleep(30)
                 break
         except Exception as e:
+
+            message = str(e)
+            code = message.split(" ")
+            if code[0]=="404":
+                "Waiting for container to start running"
+            else:
+                print(e)
             time.sleep(5)
 
 def out_header(string):
@@ -30,11 +38,17 @@ def clean_up(string):
     ctypes.windll.kernel32.SetConsoleTitleW("Capstone_Drowsiness")   
 
     out_header('Cleanup')
+    output = subprocess.check_output("docker ps -q", shell=True)
+    if len(output) > 0:
+        os.system('docker kill $(docker ps -q)')
     os.system('docker system prune')
-    os.system('docker rmi wurstmeister/kafka')
-    os.system('docker rmi wurstmeister/zookeeper')
-    os.system('docker system prune')
-    os.system('docker volume prune')
+    os.system('docker container prune')
+    output = subprocess.check_output("docker image ls -q", shell=True)
+    if len(output) > 0:
+        os.system('docker image prune')
+    output = subprocess.check_output("docker volume ls -q", shell=True)
+    if len(output) > 0:
+        os.system('docker volume prune')
     out_header(string)
 
 if __name__ == "__main__":
@@ -57,11 +71,14 @@ if __name__ == "__main__":
     
     # Kafka-Consumer #
     
-    os.system('start "Kafka Consumer" cmd /k "python python/consumer/python/consumer_main.py"')
-    os.system('start "Kafka Consumer" cmd /k "python python/consumer/python/consumer_results.py"')
+    out_header('Running Consumers for Inference and Results')
+
+    os.system('start "Kafka Consumer for Inference" cmd /k "python python/consumer_main/python/consumer_main.py --main True"')
+    os.system('start "Kafka Consumer for results" cmd /k "python python/consumer_results/python/consumer_results.py"')
     #os.system('start "Docker Consumer" cmd /k "docker build -t consumer python/consumer/. && docker run -it consumer"')
     
+    time.sleep(45)
     # Kafka-Producer #
     #os.system('start "Docker Producer" cmd /k "docker build -t producer python/producer/. && docker run -it producer"')
-    
-    os.system('start "Kafka Producer" cmd /k "python python/producer/python/producer_main.py"')
+    out_header('Running Producer for capturing webcam images and publishing on Kafka Topic')
+    os.system('start "Kafka Producer" cmd /k "python python/producer/python/producer_main.py --main True"')

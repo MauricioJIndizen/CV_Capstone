@@ -17,6 +17,7 @@ def parse_opt(known=False):
     parser.add_argument('--id', type=str, default="1", help='Producer ID')
     parser.add_argument('--images', type=int, default=480, help='Number of images from webcam to send to broker')
     parser.add_argument('--save_images', type=bool, default=False, help='Flag to save original images to local')
+    parser.add_argument('--main', type=bool, default=False, help='Flag to save images on right directory if script is runned via main.py') 
     opt = parser.parse_known_args()[0] if known else parser.parse_args()
     return opt
 
@@ -65,8 +66,13 @@ def main(opt):
             if opt.save_images:
                 filename = dt + ".jpg"
                 filename = filename.replace(":","_")
-                actual_path = os.getcwd()
-                save_path = os.path.join(actual_path,"images")
+
+                if main:
+                    actual_directory = os.path.join(os.getcwd(),'python','producer','python')
+                else:
+                    actual_directory = os.getcwd()
+
+                save_path = os.path.join(actual_directory,"images")
                 if os.path.isdir(save_path) == False:
                    os.makedirs(save_path)
                 cv2.imwrite(os.path.join(save_path,filename),frame)

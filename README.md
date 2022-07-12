@@ -1,27 +1,29 @@
 # CV_Capstone
-KAFKA INSTRUCTIONS:
 
-1) DOWNLOAD KAFKA TO LOCAL DIRECTORY
+Capstone project for drownsiness detection with real-time webcam images. Current version in full_deploy folder.
 
-https://kafka.apache.org/downloads
-EXAMPLE: C:\ProgramData\Kafka
+## RUN 
 
-2) RUN ZOOKEEPER:
+1) Install requirements.txt. 
 
-cd C:\ProgramData\Kafka\kafka_2.13-3.1.0\bin\windows
-zookeeper-server-start.bat C:\ProgramData\Kafka\kafka_2.13-3.1.0\config\zookeeper.properties
+2) For using GPU for inference on Windows, install in your computer CUDA Toolkit 11.4 (V11.4.48, cuda_11.4.r11.4/compiler.30033411_0), download cuDNN v.8.4.0 library packages and included them into Nvidia GPU Toolkit directory. Finally, include into your PATH environment variable the root to Nvidia CUDA Toolkit bin and libnvvp folders. 
 
-3) RUN KAFKA SERVER IN OTHER CMD
+3) Install Docker and docker-compose for deploy containers with Kafka and Zookeeper images.
 
-cd C:\ProgramData\Kafka\kafka_2.13-3.1.0\bin\windows
-kafka-server-start.bat C:\ProgramData\Kafka\kafka_2.13-3.1.0\config\server.properties
+4) Run main.py. This script will clean all docker containers, images, networks and volumes. Then it will run docker containers with docker-compose.yml file for Zookeeper and Kafka, and python scripts for consumer_main (inference from images published on Kafka topic), consumer_results (receive inference results from topic) and producer (publish images on Kafka topic). Note: in case of Exception "Install pypiwin32 package to enable npipe:// support", check https://github.com/twosixlabs/armory/issues/156 and run "python <path-to-python-env>\Scripts\pywin32_postinstall.py -install".
 
-4) RUN PRODUCER_MAIN.PY
+5) If you want to do it manually, follow this steps:
 
-cd C:\Users\guill\Desktop\INDIZEN\Capstone\Repositorio\CV_Capstone\python
-python producer_main.py
+    a) Run Docker Daemon/ Docker Desktop.
+    b) Execute this comand for running docker containers with Kafka and Zookeeper images: docker-compose -f docker-compose.yml up
+    c) Once Kafka is running, run python/consumer_main/python/consumer_main.py and python/consumer_results/python/consumer_results.py.
+    d) Run python/producer/python/producer_main.py for capturing images from webcam.
+    e) Results must be received on consumer_results at same rate as fps are captured from webcam.
 
-5) RUN CONSUMER_MAIN.PY
+## INFERENCE AND METRICS
 
-cd C:\Users\guill\Desktop\INDIZEN\Capstone\Repositorio\CV_Capstone\python
-python consumer_main.py
+1) Inside python folder there are 2 scripts for inference and mAP metrics for any dataset provided. 2 datasets are included, with images of a public dataset of famous people faces, and images from our webcam, with YOLO labels for eyes (class, X, Y, width and height) and results from inference included, and 2 weights from trained model versions, yolo_v2 (current best model, adn the one used in production) and yolo_v3 (most recent model, but with worse results than current).
+
+2) Run inference.py for prediction in a dataset. Images must be inside a folder named "images" inside a folder that can be passed as argument (default directory is "data"). Inference results will be saved on a folder named "results".
+
+3) Run mAP.py for mAP, precision, recall and confusion matrix metrics for any inference results inside "results" folder.
