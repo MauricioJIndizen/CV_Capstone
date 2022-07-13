@@ -4,9 +4,9 @@ Capstone project for drownsiness detection with real-time webcam images. Current
 
 ## RUN 
 
-1) Install requirements.txt. 
+1) Install requirements.txt. Pytorch packages are commented because they have to be installed via an expecific command.
 
-2) For using GPU for inference on Windows, install in your computer CUDA Toolkit 11.4 (V11.4.48, cuda_11.4.r11.4/compiler.30033411_0), download cuDNN v.8.4.0 library packages and included them into Nvidia GPU Toolkit directory. Finally, include into your PATH environment variable the root to Nvidia CUDA Toolkit bin and libnvvp folders. 
+2) For using GPU for inference on Windows, install in your computer CUDA Toolkit 11.4 (V11.4.48, cuda_11.4.r11.4/compiler.30033411_0), download cuDNN v.8.4.0 library packages and included them into Nvidia GPU Toolkit directory, and install Pytorch for CUDA 11.3 from https://pytorch.org/get-started/locally/ (at the time of writing this, command is as follows: pip3 install torch torchvision torchaudio --extra-index-url https://download.pytorch.org/whl/cu113). Finally, include into your PATH environment variable the root to Nvidia CUDA Toolkit bin and libnvvp folders. 
 
 3) Install Docker and docker-compose for deploy containers with Kafka and Zookeeper images.
 
