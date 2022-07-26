@@ -9,6 +9,7 @@ import time
 import torch
 import shutil
 from util import *
+from datetime import datetime
 
 # FUNCTION FOR START ALERT AFTER 90 IMAGES WITH CLOSED EYES
 
@@ -50,26 +51,40 @@ class Consumer():
             id = nparr.split(";")[0]
             dt = nparr.split(";")[1]
             results = nparr.split(";")[2]
-            print("Topic receive new message from Consumer " + id + ", with timestamp " + dt + ", and results " + results)
+            tiempo = str(datetime.now().strftime("%Y-%m-%d %H_%M_%S_%f"))
+            print("Topic receive new message from Consumer " + id + ", with timestamp " + dt + ", and results " + results + " a la hora " + tiempo)
             
             # SORTING RESULTS AND CHECKING IF ANY OPENED EYE
             window.append(nparr)
 
-    def consume_camera(self, result_broker, result_topic, remote, save_images):   
+    def consume_camera(self, result_broker, result_topic, remote, save_images, main):   
 
         # FUNCTION USED BY CONSUMERS THAT WILL USED YOLO MODEL TO INSPECT IMAGE
         # IF REMOTE FLAG, DOWNLOAD YOLO MODEL AND WEIGHTS FROM AZURE BLOB STORAGE. ELSE, YOLO MUST BE ALREADY DOWNLOADED ON 
         # MODEL DIRECTORY
+        
+        if main:
+            actual_directory = os.path.join(os.getcwd(),'python','consumer_main','python')
+        else:
+            actual_directory = os.getcwd()
 
-        actual_directory = os.getcwd()
         yolo_path = os.path.join(actual_directory,'model','yolo')
         yolo_directory = os.path.join(yolo_path,'ultralytics_yolov5_master')
-        yolo_model_name = os.path.join(yolo_path,'yolov2.pt')
         directory_exist = os.path.isdir(yolo_path)
+
         if remote or directory_exist == False:
             if directory_exist == True:
                 shutil.rmtree(yolo_path)
-            download_from_azure()
+            os.makedirs(yolo_path)
+            current_model_in_production = download_from_azure(yolo_path)
+            yolo_model_name = os.path.join(yolo_path,current_model_in_production)
+
+        else:
+            files = os.listdir(yolo_path)
+            for file in files:
+                if ".pt" in file:
+                    yolo_model_name = os.path.join(yolo_path,file)
+                    break
 
         try:
             # CREATE TORCH MODEL WITH YOLO ARCHITECTURE AND PRETRAINED WEIGHTS
@@ -139,7 +154,8 @@ class Consumer():
                 
                 # IF FLAG, SAVING IMAGES ON LOCAL
                 if save_images:
-                    filename = dt + ".jpg"
+                    #filename = dt + ".jpg"
+                    filename = dt + str(datetime.now().strftime("%Y-%m-%d %H_%M_%S_%f")) + ".jpg"
                     save_path = os.path.join(actual_directory,"images")
                     if os.path.isdir(save_path) == False:
                         os.makedirs(save_path)

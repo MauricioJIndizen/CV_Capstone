@@ -9,6 +9,7 @@ import time
 import torch
 import shutil
 from util import *
+from datetime import datetime
 
 # FUNCTION FOR START ALERT AFTER 90 IMAGES WITH CLOSED EYES
 
@@ -50,7 +51,8 @@ class Consumer():
             id = nparr.split(";")[0]
             dt = nparr.split(";")[1]
             results = nparr.split(";")[2]
-            print("Topic receive new message from Consumer " + id + ", with timestamp " + dt + ", and results " + results)
+            tiempo = str(datetime.now().strftime("%Y-%m-%d %H_%M_%S_%f"))
+            print("Topic receive new message from Consumer " + id + ", with timestamp " + dt + ", and results " + results + " a la hora " + tiempo)
             
             # SORTING RESULTS AND CHECKING IF ANY OPENED EYE
             window.append(nparr)
@@ -152,7 +154,8 @@ class Consumer():
                 
                 # IF FLAG, SAVING IMAGES ON LOCAL
                 if save_images:
-                    filename = dt + ".jpg"
+                    #filename = dt + ".jpg"
+                    filename = dt + str(datetime.now().strftime("%Y-%m-%d %H_%M_%S_%f")) + ".jpg"
                     save_path = os.path.join(actual_directory,"images")
                     if os.path.isdir(save_path) == False:
                         os.makedirs(save_path)

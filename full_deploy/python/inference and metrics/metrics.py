@@ -5,7 +5,6 @@
 import cv2
 import numpy as np
 import os
-import shutil
 from sklearn.metrics import auc
 from matplotlib import pyplot as plt
 from sklearn.metrics import confusion_matrix, classification_report
@@ -237,7 +236,6 @@ def create_azure_connection():
     return blob_service_client, container, tableClient
 
 def check_model_on_production(opt, blob_service_client, container, tableClient, model_info):
-    print("aqui")
     # LIST ALL ENTITIES IN TABLE AND CHECK FOR CURRENT MODEL IN PRODUCTION
     entities = list(tableClient.list_entities())
 
@@ -254,8 +252,9 @@ def check_model_on_production(opt, blob_service_client, container, tableClient, 
         result = float(current_model["Total_mAP"])
         print("Current mAP: {}".format(mAP))
         print("mAP from model in production: {}".format(result))
+        fps = round(float(model_info['model_metrics']['FPS']),2)
 
-        if result > mAP:
+        if result > mAP or fps < 30:
             # NO CHANGE NEEDED ON CURRENT MODEL
             model_info['status'] = "none"
             print("Model not improves metrics for current model in production")
@@ -286,7 +285,8 @@ def check_model_on_production(opt, blob_service_client, container, tableClient, 
         'Total_mAP': model_info['model_metrics']['Total_mAP'], 
         'mAP_class_0': model_info['model_metrics']['mAP_class_0'], 
         'mAP_class_1': model_info['model_metrics']['mAP_class_1'],
-        'status': model_info['status']
+        'status': model_info['status'],
+        'FPS': model_info['model_metrics']['FPS']
     }
 
     created_entity = tableClient.create_entity(entity=new_entity)
@@ -305,7 +305,7 @@ def check_model_on_production(opt, blob_service_client, container, tableClient, 
     print("Model saved!")
 
 # SAVING METRICS RESULTS TO CLOUD AND CHECK IF MODEL HAS BETTER METRICS THAN CURRENT MODEL IN PRODUCTION
-def save_results(opt, total_area, total_recall, total_precision, total_f1, confusion):
+def save_results(opt, total_area, total_recall, total_precision, total_f1, confusion, fps):
 
     model_info = {}
     model_info['name'] = 'model_' + str(int(time.time()))
@@ -314,16 +314,17 @@ def save_results(opt, total_area, total_recall, total_precision, total_f1, confu
     model_info['date'] = str(datetime.now().strftime("%d/%m/%Y-%H:%M:%S"))
     model_info['dataset'] = str(opt.root)
     model_info['model_metrics'] = {}
-    model_info['model_metrics']['Precision_score_class_0'] = str(total_precision[0])
-    model_info['model_metrics']['Recall_score_class_0'] = str(total_recall[0])
-    model_info['model_metrics']['F1_score_class_0'] = str(total_f1[0])
-    model_info['model_metrics']['mAP_class_0'] = str(total_area[0])
-    model_info['model_metrics']['Precision_score_class_1'] = str(total_precision[1])
-    model_info['model_metrics']['Recall_score_class_1'] = str(total_recall[1])
-    model_info['model_metrics']['F1_score_class_1'] = str(total_f1[0])
-    model_info['model_metrics']['mAP_class_1'] = str(total_area[1])
-    model_info['model_metrics']['Total_mAP'] = str(mean(total_area))
+    model_info['model_metrics']['Precision_score_class_0'] = str(round(total_precision[0],2))
+    model_info['model_metrics']['Recall_score_class_0'] = str(round(total_recall[0],2))
+    model_info['model_metrics']['F1_score_class_0'] = str(round(total_f1[0],2))
+    model_info['model_metrics']['mAP_class_0'] = str(round(total_area[0],2))
+    model_info['model_metrics']['Precision_score_class_1'] = str(round(total_precision[1],2))
+    model_info['model_metrics']['Recall_score_class_1'] = str(round(total_recall[1],2))
+    model_info['model_metrics']['F1_score_class_1'] = str(round(total_f1[0],2))
+    model_info['model_metrics']['mAP_class_1'] = str(round(total_area[1],2))
+    model_info['model_metrics']['Total_mAP'] = str(round(mean(total_area),2))
     model_info['model_metrics']['Confusion_matrix'] = str(confusion)
+    model_info['model_metrics']['FPS'] = str(round(fps,2))
 
     # CREATE CONNECTION CLIENTS WITH AZURE
     blob_service_client, container, tableClient = create_azure_connection()
@@ -331,8 +332,8 @@ def save_results(opt, total_area, total_recall, total_precision, total_f1, confu
     # CHECK METRICS WITH CURRENT MODEL IN PRODUCTION
     check_model_on_production(opt, blob_service_client, container, tableClient, model_info)
 
-def metrics(opt):
+def metrics(opt, fps):
 
     total_area, total_recall, total_precision, total_f1, confusion = calculate_mAP(opt)
     if opt.check:
-        save_results(opt, total_area, total_recall, total_precision, total_f1, confusion)
+        save_results(opt, total_area, total_recall, total_precision, total_f1, confusion, fps)

@@ -83,7 +83,7 @@ def inference(opt):
     files = os.listdir(path)
     total_number_frames = int(len(files))
     print("Starting inference of {0} images in {1}".format(total_number_frames,opt.root))
-
+    total_time = 0
     # PROGRESS BAR WITH TQDM
     for i in tqdm(range(total_number_frames)):
         
@@ -91,7 +91,11 @@ def inference(opt):
         frame = cv2.imread(os.path.join(path,image))
 
         # INFERENCE
+        start = time.time()
         result = model(frame)
+        end = time.time()
+        elapsed = (end - start)
+        total_time += elapsed
 
         # SAVING RESULTS IN A TXT
         name = image.split(".")[0] + ".txt"
@@ -107,10 +111,13 @@ def inference(opt):
             f.write(line)
         f.close()
 
+    fps = total_number_frames / total_time
+    return fps
+
 def main(opt):
 
-    inference(opt)
-    metrics(opt)
+    fps = inference(opt)
+    metrics(opt, fps)
 
 if __name__ == '__main__':
     
