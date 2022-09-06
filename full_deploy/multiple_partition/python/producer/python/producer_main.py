@@ -25,7 +25,7 @@ def parse_opt(known=False):
     parser.add_argument('--server', type=str, default='localhost:9092', help='Kafka broker IP and port for retrieving images')
     parser.add_argument('--id', type=str, default="1", help='Producer ID')
     parser.add_argument('--images', type=int, default=480, help='Number of images from webcam to send to broker')
-    parser.add_argument('--save_images', type=str2bool, default=True, help='Flag to save original images to local')
+    parser.add_argument('--save_images', type=str2bool, default=False, help='Flag to save original images to local')
     parser.add_argument('--main', type=str2bool, default=False, help='Flag to save images on right directory if script is runned via main.py') 
     opt = parser.parse_known_args()[0] if known else parser.parse_args()
     return opt

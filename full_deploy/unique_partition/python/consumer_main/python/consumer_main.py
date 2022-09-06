@@ -22,7 +22,7 @@ def parse_opt(known=False):
     parser.add_argument('--result_server', type=str, default='localhost:9092', help='Kafka broker IP and port for sending results')
     parser.add_argument('--result_topic', type=str, default="capstone_drowsiness_output", help='Kafka topic for sending results of image inspection')
     parser.add_argument('--remote', type=str2bool, default=True, help='Flag for downloading YOLO model from local or remote (Azure Blob Storage)')
-    parser.add_argument('--save_images', type=str2bool, default=True, help='Flag to save images to local with eyes recognition boxes and classes')
+    parser.add_argument('--save_images', type=str2bool, default=False, help='Flag to save images to local with eyes recognition boxes and classes')
     parser.add_argument('--main', type=str2bool, default=False, help='Flag to save and load model on right directory if script is runned via main.py') 
     parser.add_argument('--show', type=str2bool, default=False, help='Flag to show image and yolo results')   
     opt = parser.parse_known_args()[0] if known else parser.parse_args()
