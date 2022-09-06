@@ -130,14 +130,8 @@ dmypy.json
 
 # Inference results and images
 
-**/full_deploy/multiple_partition/python/inference_and_metrics/data
-**/full_deploy/multiple_partition/python/inference_and_metrics/webcam
-**/full_deploy/multiple_partition/python/consumer_main/python/images
-**/full_deploy/multiple_partition/python/consumer_main/python/model
-**/full_deploy/multiple_partition/python/producer_main/python/images
-
-**/full_deploy/unique_partition/python/inference_and_metrics/data
-**/full_deploy/unique_partition/python/inference_and_metrics/webcam
-**/full_deploy/unique_partition/python/consumer_main/python/images
-**/full_deploy/unique_partition/python/producer_main/python/images
-**/full_deploy/unique_partition/python/consumer_main/python/model
+**/inference_and_metrics/data
+**/inference_and_metrics/webcam
+**/consumer_main/python/images
+**/consumer_main/python/model
+**/producer_main/python/images
